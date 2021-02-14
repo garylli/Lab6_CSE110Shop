@@ -17,12 +17,12 @@ function storeData(data) {
 function createCards(data) {
   const items = JSON.parse(data);
   let parent = document.querySelector(".flex-container");
-  console.log(parent);
   items.forEach(element => {
     const item = document.createElement('product-item');
     item.setAttribute('img', element.image);
     item.setAttribute('title-text', element.title)
     item.setAttribute('price-num', element.price);
+    item.setAttribute('id', element.id);
     parent.appendChild(item);
   });
 }

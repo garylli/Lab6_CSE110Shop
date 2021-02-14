@@ -1,5 +1,5 @@
 // product-item.js
-
+let inCart = new Object(JSON.parse(localStorage.getItem('incart')));
 class ProductItem extends HTMLElement {
   constructor() {
     super();
@@ -21,7 +21,10 @@ class ProductItem extends HTMLElement {
     productPrice.textContent = this.getAttribute("price-num")
 
     const addButton = card.appendChild(document.createElement('button'));
-    addButton.setAttribute('onclick', "alert('Added to Cart!')")
+    addButton.addEventListener('click', (event) => { 
+      event.preventDefault();
+      updateButton(this);
+    });
     addButton.textContent = "Add to Cart";
 
     /* css styling */
@@ -38,6 +41,34 @@ class ProductItem extends HTMLElement {
   }
 }
 customElements.define('product-item', ProductItem);
+
+function updateButton(elem) {
+  const shadow = elem.shadowRoot;
+  const button = shadow.querySelector('button');
+  const cartCount = document.querySelector("#cart-count");
+  if (button.getAttribute('added') != 'true') {
+    button.setAttribute('added', 'true');
+    cartCount.textContent = parseInt(cartCount.textContent,10) + 1;
+    button.textContent = "Remove from Cart";
+    inCart[elem.getAttribute('id')] = 1; 
+  } else {
+    button.setAttribute('added','false') ;
+    cartCount.textContent = parseInt(cartCount.textContent,10) - 1;
+    button.textContent = "Add to Cart";
+    delete inCart[elem.getAttribute('id')];
+  }
+  localStorage.setItem('incart', JSON.stringify(inCart));
+}
+
+function renderButtons(id, elem) {
+  const incart = localStorage.getItem('incart');
+  if (incart != null) {
+    itemsList = JSON.parse(incart);
+    if (itemsList[id]) {
+      updateButton(elem);
+    }
+  }
+}
 function updateAttributes(elem) {
   const shadow = elem.shadowRoot;
   
@@ -45,9 +76,12 @@ function updateAttributes(elem) {
     img.src = elem.hasAttribute('img') ? elem.getAttribute('img') : '/noimg.png';
     img.setAttribute('alt', elem.getAttribute('title-text'));
   const productTitle = shadow.querySelector(".title-text");
-    productTitle.setAttribute('class','title-text');
+    productTitle.setAttribute('class','title');
     productTitle.textContent = elem.getAttribute('title-text');
   const productPrice = shadow.querySelector(".price");
     productPrice.setAttribute('class', 'price');
-    productPrice.textContent = elem.getAttribute("price-num")
+    productPrice.textContent = elem.getAttribute("price-num");
+  const idHolder = shadow.querySelector('li');
+    idHolder.setAttribute('id', elem.getAttribute('id'));
+    renderButtons(elem.getAttribute('id'), elem);
 }

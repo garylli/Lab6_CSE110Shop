@@ -11,7 +11,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 function createCards(data) {
   if (localStorage.getItem('fakestoredata') == null) {
     localStorage.setItem('fakestoredata',data);
